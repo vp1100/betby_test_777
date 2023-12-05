@@ -1,0 +1,53 @@
+[tool.poetry]
+name = "backend"
+version = "0.1.0"
+description = ""
+authors = ["svg"]
+readme = "README.md"
+packages = [
+    { include = "app" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.104.1"
+gunicorn = "^21.2.0"
+pydantic-settings = "^2.1.0"
+uvicorn = "^0.24.0.post1"
+
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.7.1"
+ruff = "^0.1.7"
+isort = "^5.12.0"
+pytest = "^7.4.3"
+
+[tool.poetry.scripts]
+dev = 'app.run:run'
+dev4 = 'app.run4:run'
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+disable_error_code = ['misc']
+check_untyped_defs = true
+warn_unreachable = true
+warn_unused_configs = true
+#disallow_untyped_defs = true
+#disallow_incomplete_defs = true
+#disallow_untyped_calls = true
+
+[tool.ruff]
+select = ["E", "F", "B", "W", "UP", "N","RUF"]
+#ignore = ["B008","RUF001","RUF003", "W293"]
+line-length = 120
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.isort]
+line_length = 120
+profile = "black"

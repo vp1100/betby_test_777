@@ -1,0 +1,8 @@
+__pycache__/
+.venv/
+.venv*/
+.nova/
+temp/
+.env
+*.env
+.DS_Store

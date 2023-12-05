@@ -3,6 +3,7 @@ import os.path
 from datetime import datetime
 from typing import Tuple
 
+import pytz
 from app.config import ROOT_DIR
 from fastapi import HTTPException
 
@@ -40,6 +41,7 @@ def read_csv(
             try:
                 # suppose that the date is in ISO format and UTC timezone
                 scheduled_time = datetime.fromisoformat(row.get("scheduled_time"))
+                scheduled_time = scheduled_time.replace(tzinfo=pytz.utc)
             except ValueError:
                 continue
 

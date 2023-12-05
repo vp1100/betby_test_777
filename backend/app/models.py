@@ -34,3 +34,19 @@ class EventsResponse(BaseModel):
         if v == "":
             return None
         return v
+
+
+class EventsTable(BaseModel):
+    id: str
+    scheduled_time: datetime
+    start_time: datetime
+    end_time: datetime
+    scheduler_id: int
+    league_id: int
+    league_name: str
+    pair_id: int
+    home_team_id: int
+    home_team_name: str
+    away_team_id: int
+    away_team_name: str
+    status: str

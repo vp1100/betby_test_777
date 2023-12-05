@@ -1,15 +1,21 @@
 from datetime import datetime
 
 from app.crud import read_csv
-from app.models import BaseResponseModel, EventsResponse
+from app.models import BaseResponseModel, EventsResponse, EventsTable
 from fastapi import APIRouter
 
 router = APIRouter()
 
 
-# multiple documents
+@router.get("/schema", response_model=BaseResponseModel)
+def get_schema() -> dict:
+    data = {"table": EventsTable.schema()}
+
+    return {"data": data}
+
+
 @router.get("", response_model=BaseResponseModel[list[EventsResponse]])
-def get_documents(
+def get_events(
     skip: int = 0,
     limit: int = 5,
     start_date: datetime | None = datetime.now().replace(day=1),

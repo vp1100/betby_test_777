@@ -16,9 +16,6 @@ export default defineConfig({
     port: 80,
     host: '0.0.0.0',
   },
-  build: {
-    chunkSizeWarningLimit: 1000
-  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

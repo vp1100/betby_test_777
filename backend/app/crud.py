@@ -1,7 +1,7 @@
 import csv
 import os.path
 from datetime import datetime
-from typing import Tuple
+from typing import Literal, Tuple
 
 import pytz
 from app.config import ROOT_DIR
@@ -16,8 +16,8 @@ def read_csv(
     path: str,
     skip: int,
     limit: int,
-    start_date: datetime | None = None,
-    end_date: datetime | None = None,
+    start_date: datetime,
+    end_date: datetime,
 ) -> Tuple[list[dict], int]:
     if not os.path.isfile(ROOT_DIR + path):
         raise HTTPException(404, "Data not found")
@@ -40,7 +40,7 @@ def read_csv(
         for row in csv_reader:
             try:
                 # suppose that the date is in ISO format and UTC timezone
-                scheduled_time = datetime.fromisoformat(row.get("scheduled_time"))
+                scheduled_time = datetime.fromisoformat(row.get("scheduled_time"))  # type: ignore [arg-type]
                 scheduled_time = scheduled_time.replace(tzinfo=pytz.utc)
             except ValueError:
                 continue
@@ -53,4 +53,18 @@ def read_csv(
 
     total = len(rows)
 
-    return sampling(rows, skip, limit), total
+    return rows, total
+
+
+def sort_rows(
+    rows: list, sort: str | None = None, order: Literal["asc", "desc"] | None = "asc"
+):
+    if sort is None:
+        return rows
+
+    if sort not in list(rows[0].keys()):
+        return rows
+
+    reverse = True if order == "asc" else False
+
+    return sorted(rows, key=lambda x: x[sort], reverse=reverse)

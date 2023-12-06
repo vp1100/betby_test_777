@@ -12,10 +12,13 @@
       'columns',
       'rows',
       'searchQuery',
+      'sort',
+      'order',
     ],
     
     emits: [
       'rowsTotalFiltered',
+      'setSort',
     ],
     
     data() {
@@ -40,16 +43,11 @@
               break
             }
           }
-          
         }
         
         this.$emit('rowsTotalFiltered', rowsFiltered.length)
         
         return rowsFiltered
-      },
-      
-      columnCount() {
-        return Object.keys(this.columns).length
       },
     },
     
@@ -62,7 +60,6 @@
     },
     
     methods: {
-      
       getCellClass(columnName, columnProp) {
         if (!columnName || !columnProp) return ''
         const style = []
@@ -104,6 +101,14 @@
         return cols.join(' ')
       },
       
+      setSort(sort) {
+        if (this.sort == sort && this.order == 'desc' ) {
+          this.$emit('setSort', null, null)
+        } else {
+          this.$emit('setSort', sort, (this.sort == sort) ? 'desc' : 'asc')
+        }
+      }
+      
       //
     },
     
@@ -117,10 +122,10 @@
       class="bg-white w-fit outline-none shadow-md border border-b-0 border-t-0 border-gray-400 table-model"
       tabindex="-1"
     >
-      <div class="grid text-center border-b border-gray-400 divide-x divide-gray-400" :style="'grid-template-columns: '+getGridTemplate()">
+      <div class="grid text-center border-b border-gray-400 divide-x divide-gray-400 select-none" :style="'grid-template-columns: '+getGridTemplate()">
         <template v-for="column, key in columns" :key="key">
-          <div class="p-0.5 bg-zinc-300 font-semibold">
-            {{ column.title }}
+          <div class="p-0.5 bg-zinc-300 font-semibold" :class="(sort == key) ? 'underline' : ''" @click="setSort(key)">
+            {{ column.title }} {{ (sort == key) ? ((order == 'desc') ? '+' : '-' ) : '' }}
           </div>
         </template>
       </div>
@@ -135,7 +140,6 @@
         list-class="-border border-gray-400"
         :emit-update="false"
       >
-      
         <template #default="{ item }">
           <div :id="item.id" :class="['h-[30px] grid divide-x divide-y divide-y-reverse divide-gray-300 table-row']" :style="'grid-template-columns: '+getGridTemplate()">
             <template v-for="(columnProp, columnName) in columns" :key="columnName">
@@ -145,13 +149,11 @@
             </template>
           </div>
         </template>
-    
       </RecycleScroller>
       
       <template v-if="!rows || !rows.length">
         <slot name="empty" />
       </template>
-    
     </div>
   </template>
   

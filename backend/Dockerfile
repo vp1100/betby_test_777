@@ -1,7 +1,6 @@
 # Builder
 FROM python:3.11-slim AS builder
 
-#RUN apt-get update && apt-get install -y libpq-dev gcc
 RUN pip install --upgrade --no-cache-dir poetry==1.4.2
 
 ENV POETRY_NO_INTERACTION=1 \
@@ -15,10 +14,6 @@ RUN poetry install --without dev --no-root
 
 # Final
 FROM python:3.11-slim
-
-#RUN apt-get update && \
-#    apt-get install -y libpq-dev && \
-#    rm -rf /var/lib/apt/lists/*
 
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"

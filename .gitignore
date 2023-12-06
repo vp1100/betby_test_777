@@ -3,8 +3,6 @@ __pycache__/
 .venv*/
 .nova/
 temp/
-.env
-*.env
 .DS_Store
 
 # Logs

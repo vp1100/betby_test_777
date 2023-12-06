@@ -20,13 +20,16 @@
         title: "Events table",
         base_url: '/events',
         
+        sort: null,
+        order: null,
+        
         columns: [],
         columnsLoaded: false,
         
         rows: [],
         rowsLoaded: false,
         
-        rowsTotal: null,
+        rowsTotal: 0,
         rowsTotalLoaded: 0,
         rowsRequestLimit: 10,
         rowsLoadingNow: false,
@@ -50,7 +53,7 @@
       
       async getTableDataMore() {
         if (this.rowsTotalLoaded >= this.rowsTotal) return this.rowsLoadingNow = false
-        await new Promise(r => setTimeout(r, 10))
+        await new Promise(r => setTimeout(r, 50)) // slow down to show loading process
         
         const {d, msg} = await http({
           url: this.base_url,
@@ -59,17 +62,16 @@
             end_date: this.datePeriod?.[1],
             skip: this.rowsTotalLoaded,
             limit: this.rowsRequestLimit,
+            sort: this.sort,
+            order: this.order,
           },
         })
         
         if (!d?.data) return this.status = msg
         if (d.data?.length == 0) return
         
-        
-        
-        for (const [i, r] of d.data) {
+        for (const [i, r] of d.data.entries()) {
           Object.assign(this.rows[(this.rowsTotalLoaded + i)], r)
-          //this.rows.splice(this.rowsTotalLoaded + i, 1, r)
         }
         
         this.rowsTotalLoaded = this.rowsTotalLoaded + d.data.length
@@ -89,6 +91,8 @@
             end_date: this.datePeriod?.[1],
             skip: 0,
             limit: this.rowsRequestLimit,
+            sort: this.sort,
+            order: this.order,
           },
         })
         if (!d?.data) return this.status = msg
@@ -96,11 +100,11 @@
         if (this.rows.length != d.total) {
           this.rows = []
           for (let step = 0; step < d.total; step++) {
-            this.rows.push({ id: step + 1 + 900000 })
+            this.rows.push({ id: step + 1 })
           }
         }
         
-        for (const [i, r] of d.data) {
+        for (const [i, r] of d.data.entries()) {
           Object.assign(this.rows[i], r)
         }
         
@@ -121,6 +125,12 @@
         await new Promise(r => setTimeout(r, 50))
         this.getTable()
       },
+      
+      setSort(sort, order) {
+        this.sort = sort
+        this.order = order
+        this.getTable()
+      }
     },
     
     // end
@@ -134,14 +144,14 @@
       
       <div class="flex items-center gap-4 mr-4">
         <div v-if="rowsTotal != rowsTotalLoaded" class="text-sm text-gray-600">
-          Загрузка журнала: {{ Math.round(rowsTotalLoaded / rowsTotal * 100) }}%
+          Загрузка записей: {{ Math.round(rowsTotalLoaded / rowsTotal * 100) }}%
         </div>
         
         <div v-show="searchQuery" class="text-sm text-gray-600">
           Найдено: {{ rowsTotalFiltered }}
         </div>
         <div v-show="rowsTotal" class="text-sm text-gray-600 ">
-          Всего документов: {{ rowsTotal }}
+          Всего записей: {{ rowsTotal }}
         </div>
       </div>
       
@@ -172,7 +182,10 @@
       :search-query="searchQuery"
       :columns="columns"
       :rows="rows"
+      :sort="sort"
+      :order="order"
       @rows-total-filtered="rowsTotalFiltered = $event"
+      @set-sort="setSort"
     > 
       <template #empty>
         <div class="p-4 pl-14 text-gray-800">
@@ -181,5 +194,8 @@
       </template>
     </TableModel>
     
+  </div>
+  <div v-else class="p-10 text-center font-bold">
+    {{ status }}
   </div>
 </template>

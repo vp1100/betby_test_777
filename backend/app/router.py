@@ -1,6 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import Literal
 
-from app.crud import read_csv
+from app.crud import read_csv, sampling, sort_rows
 from app.models import BaseResponseModel, EventsResponse, EventsTable
 from fastapi import APIRouter
 
@@ -18,9 +19,15 @@ def get_schema() -> dict:
 def get_events(
     skip: int = 0,
     limit: int = 5,
-    start_date: datetime | None = datetime.now().replace(day=1),
-    end_date: datetime | None = datetime.now(),
+    start_date: datetime | None = datetime.now(timezone.utc).replace(day=1),
+    end_date: datetime | None = datetime.now(timezone.utc),
+    sort: str | None = None,
+    order: Literal["asc", "desc"] | None = None,
 ) -> dict:
-    data, total = read_csv("/data/events.csv", skip, limit, start_date, end_date)
+    rows, total = read_csv("/data/events.csv", skip, limit, start_date, end_date)
 
-    return {"data": data, "total": total}
+    rows = sort_rows(rows, sort, order)
+
+    rows = sampling(rows, skip, limit)
+
+    return {"data": rows, "total": total}

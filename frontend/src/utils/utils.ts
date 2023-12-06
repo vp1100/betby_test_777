@@ -4,7 +4,7 @@ export function isObject(value) {
   return typeof value === "object" && !Array.isArray(value) && value !== null
 }
 
-export const periodToday = [startOfDay(new Date()), endOfDay(new Date())]
+export const periodToday = [startOfMonth(startOfDay(new Date())), endOfDay(new Date())]
 
 export const defaultPresetRanges = [
   {label: 'Сегодня', range: [new Date(), new Date()]},
